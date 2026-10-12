@@ -19,13 +19,19 @@ jobs:
           service-account: deployer@demo.yqw.cloud.fogpipe.com
 
       - name: Install fpcloud
-        run: |
-          curl -fsSL https://raw.githubusercontent.com/fogpipe/cloud-cli/main/install.sh \
-            | FPCLOUD_VERSION=v0.206.0 FPCLOUD_INSTALL_DIR="$HOME/.local/bin" sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+        uses: fogpipe/cloud-actions/setup@v1
 
       - name: Stamp commit and time
         run: sed -i "s/__COMMIT__/${GITHUB_SHA::7}/; s/__DEPLOYED_AT__/$(date -u +%FT%TZ)/" public/index.html
 
       - name: Deploy
-        run: fpcloud website deploy site ./public --project demo
+        uses: fogpipe/cloud-actions/website@v1
+        with:
+          project: demo
+          name: site
+          dir: public
+
+      - name: Summary
+        run: |
+          url="$(fpcloud --project demo website show site -o json | jq -r .url)"
+          echo "Deployed [\`${GITHUB_SHA::7}\`](${{ github.server_url }}/${{ github.repository }}/commit/${GITHUB_SHA}) to ${url}" >> "$GITHUB_STEP_SUMMARY"

@@ -12,15 +12,15 @@ fpcloud --project demo iam set \
   --member serviceAccount:deployer@demo.yqw.cloud.fogpipe.com --role editor
 
 fpcloud --project demo federation github add \
-  --repo fogpipe/fpcloud-demo-site \
+  --repo fogpipe/fpcloud-demo-site --ref refs/heads/main \
   --service-account deployer@demo.yqw.cloud.fogpipe.com
 ```
 
 ## Demo
 
-Edit `public/index.html`, push to `main`, and open
-https://site-demo-yqw-web.fogpipe.cloud. The page shows the commit it was
-deployed from.
+Edit `public/index.html` and push to `main`. The run's summary links the
+live site, which shows the commit it was deployed from. Only `main` can
+deploy: pull request runs are not trusted.
 
 ```bash
 fpcloud --project demo website versions site   # every deploy
