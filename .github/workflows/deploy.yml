@@ -1,0 +1,29 @@
+name: deploy
+on:
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    # Skipped until the one-time setup in README.md has set this variable.
+    if: vars.FPCLOUD_DEPLOY_SA != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: fogpipe/cloud-actions/auth@v1
+        with:
+          service-account: ${{ vars.FPCLOUD_DEPLOY_SA }}
+
+      - run: |
+          curl -fsSL https://raw.githubusercontent.com/fogpipe/cloud-cli/main/install.sh \
+            | FPCLOUD_VERSION=v0.206.0 FPCLOUD_INSTALL_DIR="$HOME/.local/bin" sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - run: |
+          sed -i "s/__COMMIT__/${GITHUB_SHA::7}/; s/__DEPLOYED_AT__/$(date -u +%FT%TZ)/" public/index.html
+          fpcloud website deploy site ./public --project demo
