@@ -1,28 +1,24 @@
 # fpcloud-demo-site
 
 A static page that deploys to FP Cloud on every push to `main`, using GitHub
-OIDC. No keys are stored in GitHub.
+OIDC. Nothing is stored in GitHub: no keys, no secrets.
 
 ## One-time setup
 
-Assumes you're logged in (`fpcloud login`) and the `demo` project exists.
-
 ```bash
-# 1. A service account for CI, allowed to deploy to the project
 fpcloud --project demo sa create deployer
-SA=$(fpcloud --project demo sa list -o json | jq -r '.[] | select(.name=="deployer") | .id')
-fpcloud --project demo iam set --member serviceAccount:$SA --role editor
 
-# 2. Trust this repo's GitHub Actions to act as it
-fpcloud --project demo federation github add --repo fogpipe/fpcloud-demo-site --service-account $SA
+fpcloud --project demo iam set \
+  --member serviceAccount:deployer@demo.yqw.cloud.fogpipe.com --role editor
 
-# 3. Tell the workflow which account to use (an id, not a secret)
-gh variable set FPCLOUD_DEPLOY_SA --repo fogpipe/fpcloud-demo-site --body $SA
+fpcloud --project demo federation github add \
+  --repo fogpipe/fpcloud-demo-site \
+  --service-account deployer@demo.yqw.cloud.fogpipe.com
 ```
 
 ## Demo
 
-Edit `public/index.html`, push to `main`, then open
+Edit `public/index.html`, push to `main`, and open
 https://site-demo-yqw-web.fogpipe.cloud. The page shows the commit it was
 deployed from.
 
