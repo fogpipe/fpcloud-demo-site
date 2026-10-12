@@ -18,11 +18,11 @@ fpcloud --project demo federation github add \
 
 ## Demo
 
-Edit `public/index.html` and push to `main`. The run's summary links the
-live site, which shows the commit it was deployed from. Only `main` can
-deploy: pull request runs are not trusted.
+Edit `public/index.html` and push to `main`. Only `main` can deploy: pull
+request runs are not trusted.
 
 ```bash
+fpcloud --project demo website show site       # the live URL
 fpcloud --project demo website versions site   # every deploy
 fpcloud --project demo website rollback site   # back to the previous one
 ```
